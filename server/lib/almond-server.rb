@@ -6,6 +6,10 @@ class AlmondServer< Sinatra::Base
   DEFAULT_HOST = 'localhost'
   DEFAULT_PORT = 2412
 
+  def initialize
+    @code_repository = "/tmp/almond/data"
+  end
+
   dir = File.dirname(File.expand_path(__FILE__))
   set :views,  "#{dir}/views"
 
@@ -15,12 +19,14 @@ class AlmondServer< Sinatra::Base
 
   helpers do
     def trigger_happy(trigger, args='')
-      # check if trigger exists
-      
-      # execute file if so
-      
-      # return 404 if not
-      halt 404, "sorry, trigger not found."
+      mayhaps = File.join(@code_repository, trigger)
+      puts mayhaps
+      if File.executable?(mayhaps)
+        # execute file
+        return %x["#{mayhaps}"]
+      else
+        halt 404, "sorry, trigger not found."
+      end
     end
   end
 
